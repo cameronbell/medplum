@@ -99,3 +99,7 @@ playwright/.cache/
 
 # 0x profiling data
 *.0x
+
+# Allow @medplum/core dist to be committed for CDN usage
+!packages/core/dist/
+!packages/core/dist/**

@@ -1,0 +1,10 @@
+export declare const UCUM = "http://unitsofmeasure.org";
+export declare const LOINC = "http://loinc.org";
+export declare const SNOMED = "http://snomed.info/sct";
+export declare const RXNORM = "http://www.nlm.nih.gov/research/umls/rxnorm";
+export declare const CPT = "http://www.ama-assn.org/go/cpt";
+export declare const ICD10 = "http://hl7.org/fhir/sid/icd-10";
+export declare const NDC = "http://hl7.org/fhir/sid/ndc";
+export declare const HTTP_HL7_ORG = "http://hl7.org";
+export declare const HTTP_TERMINOLOGY_HL7_ORG = "http://terminology.hl7.org";
+//# sourceMappingURL=constants.d.ts.map
