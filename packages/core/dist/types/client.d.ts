@@ -22,6 +22,14 @@ export type ClientLogLevel = 'none' | 'basic' | 'verbose';
 export declare const MEDPLUM_VERSION: string;
 export declare const MEDPLUM_CLI_CLIENT_ID = "medplum-cli";
 export declare const DEFAULT_ACCEPT: string;
+interface ILocationUtils {
+    assign(url: string): void;
+    reload(): void;
+    getSearch(): string;
+    getPathname(): string;
+    getLocation(): string;
+    getOrigin(): string;
+}
 /**
  * The MedplumClientOptions interface defines configuration options for MedplumClient.
  *
@@ -160,6 +168,7 @@ export interface MedplumClientOptions {
      * Default is `window.localStorage` (if available), this is the common implementation for use in the browser, or an in-memory storage implementation.  If using Medplum on a server it may be useful to provide a custom storage implementation, for example using redis, a database or a file based storage.  Medplum CLI is an an example of `FileSystemStorage`, for reference.
      */
     storage?: IClientStorage;
+    locationUtils?: ILocationUtils;
     /**
      * Create PDF implementation.
      *
@@ -716,6 +725,7 @@ export declare class MedplumClient extends TypedEventTarget<MedplumClientEventMa
     private readonly fetch;
     private readonly createPdfImpl?;
     private readonly storage;
+    private readonly locationUtils;
     protected readonly requestCache: LRUCache<RequestCacheEntry> | undefined;
     private readonly cacheTime;
     private readonly baseUrl;
@@ -2347,4 +2357,5 @@ export declare class MedplumClient extends TypedEventTarget<MedplumClientEventMa
 }
 export declare function normalizeCreateBinaryOptions(arg1: BinarySource | CreateBinaryOptions, arg2: string | undefined | MedplumRequestOptions, arg3?: string, arg4?: (e: ProgressEvent) => void): CreateBinaryOptions;
 export declare function normalizeCreatePdfOptions(arg1: TDocumentDefinitions | CreatePdfOptions, arg2: string | undefined | MedplumRequestOptions, arg3: Record<string, CustomTableLayout> | undefined, arg4: TFontDictionary | undefined): CreatePdfOptions;
+export {};
 //# sourceMappingURL=client.d.ts.map

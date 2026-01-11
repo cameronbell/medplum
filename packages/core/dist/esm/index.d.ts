@@ -2516,6 +2516,15 @@ export declare interface IClientStorage {
     makeKey(key: string): string;
 }
 
+declare interface ILocationUtils {
+    assign(url: string): void;
+    reload(): void;
+    getSearch(): string;
+    getPathname(): string;
+    getLocation(): string;
+    getOrigin(): string;
+}
+
 export declare interface ILogger {
     level: LogLevel;
     error(msg: string, data?: Record<string, any> | Error): void;
@@ -3393,6 +3402,7 @@ export declare class MedplumClient extends TypedEventTarget<MedplumClientEventMa
     private readonly fetch;
     private readonly createPdfImpl?;
     private readonly storage;
+    private readonly locationUtils;
     protected readonly requestCache: LRUCache<RequestCacheEntry> | undefined;
     private readonly cacheTime;
     private readonly baseUrl;
@@ -5188,6 +5198,7 @@ export declare interface MedplumClientOptions {
      * Default is `window.localStorage` (if available), this is the common implementation for use in the browser, or an in-memory storage implementation.  If using Medplum on a server it may be useful to provide a custom storage implementation, for example using redis, a database or a file based storage.  Medplum CLI is an an example of `FileSystemStorage`, for reference.
      */
     storage?: IClientStorage;
+    locationUtils?: ILocationUtils;
     /**
      * Create PDF implementation.
      *

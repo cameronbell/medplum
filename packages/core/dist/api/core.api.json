@@ -47373,6 +47373,34 @@
             },
             {
               "kind": "PropertySignature",
+              "canonicalReference": "@medplum/core!MedplumClientOptions#locationUtils:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "locationUtils?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ILocationUtils",
+                  "canonicalReference": "@medplum/core!~ILocationUtils:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "locationUtils",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
               "canonicalReference": "@medplum/core!MedplumClientOptions#logLevel:member",
               "docComment": "/**\n * Log level for requests and responses. - 'none': No logging (default) - 'basic': Log method, URL, and status code only (no sensitive headers) - 'verbose': Log all details including headers (may include sensitive data like tokens)\n *\n * @defaultValue 'none'\n */\n",
               "excerptTokens": [

@@ -357,6 +357,25 @@ Use this if you want to use a different path when connecting to a FHIR server.
 </td></tr>
 <tr><td>
 
+[locationUtils?](./core.medplumclientoptions.locationutils.md)
+
+
+</td><td>
+
+
+</td><td>
+
+ILocationUtils
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
 [logLevel?](./core.medplumclientoptions.loglevel.md)
 
 

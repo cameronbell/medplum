@@ -123,6 +123,20 @@ const system: Device = {
   deviceName: [{ type: 'model-name', name: 'System' }],
 };
 
+interface ILocationUtils {
+  assign(url: string): void;
+
+  reload(): void;
+
+  getSearch(): string;
+
+  getPathname(): string;
+
+  getLocation(): string;
+
+  getOrigin(): string;
+}
+
 /**
  * The MedplumClientOptions interface defines configuration options for MedplumClient.
  *
@@ -276,6 +290,8 @@ export interface MedplumClientOptions {
    * Default is `window.localStorage` (if available), this is the common implementation for use in the browser, or an in-memory storage implementation.  If using Medplum on a server it may be useful to provide a custom storage implementation, for example using redis, a database or a file based storage.  Medplum CLI is an an example of `FileSystemStorage`, for reference.
    */
   storage?: IClientStorage;
+
+  locationUtils?: ILocationUtils;
 
   /**
    * Create PDF implementation.
@@ -908,6 +924,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
   private readonly fetch: FetchLike;
   private readonly createPdfImpl?: CreatePdfFunction;
   private readonly storage: IClientStorage;
+  private readonly locationUtils: ILocationUtils;
   protected readonly requestCache: LRUCache<RequestCacheEntry> | undefined;
   private readonly cacheTime: number;
   private readonly baseUrl: string;
@@ -952,6 +969,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
     this.options = options ?? {};
     this.fetch = options?.fetch ?? getDefaultFetch();
     this.storage = options?.storage ?? new ClientStorage(undefined, options?.storagePrefix);
+    this.locationUtils = options?.locationUtils ?? locationUtils;
     this.createPdfImpl = options?.createPdf;
     this.baseUrl = ensureTrailingSlash(options?.baseUrl ?? DEFAULT_BASE_URL);
     this.fhirBaseUrl = concatUrls(this.baseUrl, options?.fhirUrlPath ?? 'fhir/R4');
@@ -1445,7 +1463,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
    * @returns The user profile resource if available.
    */
   async signInWithRedirect(loginParams?: Partial<BaseLoginRequest>): Promise<ProfileResource | undefined> {
-    const urlParams = new URLSearchParams(locationUtils.getSearch());
+    const urlParams = new URLSearchParams(this.locationUtils.getSearch());
     const code = urlParams.get('code');
     if (!code) {
       await this.requestAuthorization(loginParams);
@@ -1460,7 +1478,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
    * @category Authentication
    */
   signOutWithRedirect(): void {
-    locationUtils.assign(this.logoutUrl);
+    this.locationUtils.assign(this.logoutUrl);
   }
 
   /**
@@ -1483,7 +1501,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
     if (pkceEnabled) {
       loginRequest = await this.ensureCodeChallenge(baseLogin);
     }
-    locationUtils.assign(
+    this.locationUtils.assign(
       this.getExternalAuthRedirectUri(authorizeUrl, clientId, redirectUri, loginRequest, pkceEnabled)
     );
   }
@@ -3893,11 +3911,11 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('state', this.storage.getString('pkceState') as string);
     url.searchParams.set('client_id', loginRequest.clientId ?? (this.clientId as string));
-    url.searchParams.set('redirect_uri', loginRequest.redirectUri ?? locationUtils.getOrigin());
+    url.searchParams.set('redirect_uri', loginRequest.redirectUri ?? this.locationUtils.getOrigin());
     url.searchParams.set('code_challenge_method', loginRequest.codeChallengeMethod as string);
     url.searchParams.set('code_challenge', loginRequest.codeChallenge as string);
     url.searchParams.set('scope', loginRequest.scope ?? 'openid profile');
-    locationUtils.assign(url.toString());
+    this.locationUtils.assign(url.toString());
   }
 
   /**
@@ -3913,7 +3931,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
       grant_type: OAuthGrantType.AuthorizationCode,
       code,
       client_id: loginParams?.clientId ?? this.clientId ?? '',
-      redirect_uri: loginParams?.redirectUri ?? locationUtils.getOrigin(),
+      redirect_uri: loginParams?.redirectUri ?? this.locationUtils.getOrigin(),
     };
 
     if (this.storage) {
@@ -4389,7 +4407,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
         // On storage clear (key === null) or profile change (key === 'activeLogin', and profile in 'activeLogin' is different)
         // Refresh the page to ensure the active login is up to date.
         if (e.key === null) {
-          locationUtils.reload();
+          this.locationUtils.reload();
         } else if (e.key === this.storage.makeKey('activeLogin')) {
           const oldState = (e.oldValue ? JSON.parse(e.oldValue) : undefined) as LoginState | undefined;
           const newState = (e.newValue ? JSON.parse(e.newValue) : undefined) as LoginState | undefined;
@@ -4397,7 +4415,7 @@ export class MedplumClient extends TypedEventTarget<MedplumClientEventMap> {
             oldState?.profile.reference !== newState?.profile.reference ||
             !this.checkSessionDetailsMatchLogin(newState)
           ) {
-            locationUtils.reload();
+            this.locationUtils.reload();
           } else if (newState) {
             this.setAccessToken(newState.accessToken, newState.refreshToken);
           } else {
